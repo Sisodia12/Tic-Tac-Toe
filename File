@@ -1,0 +1,79 @@
+import random
+
+def print_board(board):
+    for row in board:
+        print(" | ".join(row))
+        print("-" * 9)
+
+def check_winner(board):
+    # Check rows, columns, and diagonals for a winner
+    for row in board:
+        if row.count(row[0]) == 3 and row[0] != " ":
+            return row[0]
+    
+    for col in range(3):
+        if board[0][col] == board[1][col] == board[2][col] != " ":
+            return board[0][col]
+    
+    if board[0][0] == board[1][1] == board[2][2] != " ":
+        return board[0][0]
+    
+    if board[0][2] == board[1][1] == board[2][0] != " ":
+        return board[0][2]
+    
+    return None
+
+def is_board_full(board):
+    return all(cell != " " for row in board for cell in row)
+
+def player_move(board, player):
+    while True:
+        try:
+            move = int(input(f"Player {player}, enter your move (1-9): ")) - 1
+            if move < 0 or move > 8:
+                raise ValueError("Invalid input. Please enter a number between 1 and 9.")
+            row, col = divmod(move, 3)
+            if board[row][col] != " ":
+                raise ValueError("This cell is already taken. Choose another one.")
+            board[row][col] = player
+            break
+        except ValueError as e:
+            print(e)
+
+def ai_move(board, player):
+    available_moves = [(i, j) for i in range(3) for j in range(3) if board[i][j] == " "]
+    if available_moves:
+        row, col = random.choice(available_moves)
+        board[row][col] = player
+
+def main():
+    print("Welcome to Tic Tac Toe!")
+    mode = input("Choose mode: (1) Two Player (2) Single Player: ")
+    
+    while mode not in ['1', '2']:
+        mode = input("Invalid choice. Please choose (1) Two Player or (2) Single Player: ")
+
+    board = [[" " for _ in range(3)] for _ in range(3)]
+    current_player = "X"
+
+    while True:
+        print_board(board)
+        if mode == '1' or (mode == '2' and current_player == "X"):
+            player_move(board, current_player)
+        else:
+            ai_move(board, current_player)
+
+        winner = check_winner(board)
+        if winner:
+            print_board(board)
+            print(f"Player {winner} wins!")
+            break
+        elif is_board_full(board):
+            print_board(board)
+            print("It's a draw!")
+            break
+
+        current_player = "O" if current_player == "X" else "X"
+
+if __name__ == "__main__":
+    main()
